@@ -22,3 +22,16 @@ weight_url = {
 'Xception_DFDC':'https://f002.backblazeb2.com/file/icpr2020/Xception_DFDC_bestval-e826cdb64d73ef491e6b8ff8fce0e1e1b7fc1d8e2715bc51a56280fff17596f9.pth',
 'Xception_FFPP':'https://f002.backblazeb2.com/file/icpr2020/Xception_FFPP_bestval-bb119e4913cb8f816cd28a03f81f4c603d6351bf8e3f8e3eb99eebc923aecd22.pth',
 }
+
+# 학습된 모델 가중치 파일입니다. 
+# 각각의 URL은 특정한 모델 (예: EfficientNet, Xception)을 FF++ 또는 DFDC 데이터셋으로 학습한 후 최종 결과를 저장한 파일입니다. 
+# 이 파일들을 사용하여 모델을 로드하고, 추론하거나 파인튜닝할 수 있습니다.
+# ex) EfficientNetAutoAttB4ST_FFPP_bestval.pth: EfficientNetAutoAttB4 모델이 FF++ 데이터셋으로 학습된 후 최상의 성능을 기록한 가중치를 저장한 파일.
+# ex) Xception_DFDC_bestval.pth: Xception 모델이 DFDC 데이터셋으로 학습된 후 최상의 성능을 기록한 가중치를 저장한 파일.
+# .pth 파일들은 학습된 모델을 재사용할 때 매우 중요한 역할을 합니다.
+# .pth file by default only contains the model’s weights and biases
+# however you can choose to store hyperparameters manually if needed.
+
+
+
+# 다 이해할수있고 다 할수있다.!

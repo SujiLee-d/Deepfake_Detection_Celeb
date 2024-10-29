@@ -81,6 +81,13 @@ def main(argv):
     print('Loading video DataFrame')
     df_videos = pd.read_pickle(videodataset_path)
 
+    # error here
+    # pd.read_pickle; 
+    # Restores Python objects: (pickle로 serialization해 저장된 것을 original format으로 돌림)
+    # It restores any kind of Python object that was serialized with pickle, 
+    # including pandas DataFrames and Series.
+    # Store machine learning models, pandas objects, or any other complex data structure and retrieve them as needed.
+
     if num > 0:
         df_videos_process = df_videos.iloc[offset:offset + num]
     else:

@@ -47,29 +47,46 @@ EfficientNet
 
 
 class EfficientNetGen(FeatureExtractor):
+
+    # EfficientNetGen 클래스는 FeatureExtractor 클래스를 상속받아 EfficientNet 기반의 모델을 구현합니다.
+       
     def __init__(self, model: str):
         super(EfficientNetGen, self).__init__()
 
         self.efficientnet = EfficientNet.from_pretrained(model)
+        # EfficientNet.from_pretrained(model): EfficientNet을 **사전 학습된 모델(pretrained model)**로 불러옵니다. 
+        # 여기서 model은 어떤 EfficientNet 버전을 사용할지 지정합니다.
         self.classifier = nn.Linear(self.efficientnet._conv_head.out_channels, 1)
+        # self.classifier = nn.Linear(): 모델의 **최종 분류기(classifier)**를 정의합니다. EfficientNet의 마지막 층인 Conv2D 층의 출력 채널 수에 맞게 **선형 레이어(fully connected layer)**를 추가하여, 최종 출력이 1개(이진 분류)로 맞춰집니다.
+
         del self.efficientnet._fc
+        # EfficientNet에서 제공하는 **기본 분류기(fully connected layer)**를 삭제하고, 커스텀 분류기를 대신 사용합니다.
+
 
     def features(self, x: torch.Tensor) -> torch.Tensor:
+    # features 메소드는 입력 이미지 **x**에서 **특징(feature)**을 추출하는 과정입니다.
+
         x = self.efficientnet.extract_features(x)
         x = self.efficientnet._avg_pooling(x)
         x = x.flatten(start_dim=1)
         return x
 
     def forward(self, x):
+    # forward method deifnes 'forward pass' process
+        
         x = self.features(x)
+        # 특징 추출
         x = self.efficientnet._dropout(x)
+        # overfitting 방지
         x = self.classifier(x)
+        # nn.linear
         return x
 
 
 class EfficientNetB4(EfficientNetGen):
     def __init__(self):
         super(EfficientNetB4, self).__init__(model='efficientnet-b4')
+        # model='efficientnet-b4'을 통해 EfficientNet B4를 사전 학습된 모델로 불러옵니다.
 
 
 """
