@@ -4,3 +4,6 @@
 .ipynb_checkpoints/
 __pycache__/
 /anaconda3/envs/deepfake/
+test/data/ffpp/
+test/data/dfdc/
+
