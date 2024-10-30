@@ -135,10 +135,12 @@ def main():
 
     # Loss and optimizers
     criterion = nn.BCEWithLogitsLoss()
+    # loss function - 이진 분류 문제이므로 BCEWithLogitsLoss를 사용합니다.
 
     min_lr = initial_lr * 1e-5
     optimizer = optim.Adam(net.get_trainable_parameters(), lr=initial_lr)
     lr_scheduler = optim.lr_scheduler.ReduceLROnPlateau(
+        # 스케줄러: ReduceLROnPlateau로 설정하여 검증 손실이 개선되지 않으면 학습률을 줄입니다.
         optimizer=optimizer,
         mode='min',
         factor=0.1,
@@ -198,6 +200,7 @@ def main():
         shutil.rmtree(logdir, ignore_errors=True)
 
     # TensorboardX instance
+    # Tensorboard logging instance - for visualisation
     tb = SummaryWriter(logdir=logdir)
     if iteration == 0:
         dummy = torch.randn((1, 3, face_size, face_size), device=device)
@@ -209,6 +212,7 @@ def main():
     transformer = utils.get_transformer(face_policy=face_policy, patch_size=face_size,
                                         net_normalizer=net.get_normalizer(), train=True)
 
+    #TODO
     # Datasets and data loaders
     print('Loading data')
     # Check if paths for DFDC and FF++ extracted faces and DataFrames are provided
@@ -222,6 +226,8 @@ def main():
             raise RuntimeError('Specify DataFrame and directory for DFDC faces for validation!')
         elif dataset.split('-')[0] == 'ff' and (ffpp_df_path is None or ffpp_faces_dir is None):
             raise RuntimeError('Specify DataFrame and directory for FF++ faces for validation!')
+        
+    #TODO
     # Load splits with the make_splits function
     splits = split.make_splits(dfdc_df=dfdc_df_path, ffpp_df=ffpp_df_path, dfdc_dir=dfdc_faces_dir, ffpp_dir=ffpp_faces_dir,
                                dbs={'train': train_datasets, 'val': val_datasets})
@@ -292,7 +298,7 @@ def main():
             optimizer.step()
             optimizer.zero_grad()
 
-            # Logging
+            # Logging (every log_interval invervals)
             if iteration > 0 and (iteration % log_interval == 0):
                 train_loss /= train_num
                 tb.add_scalar('train/loss', train_loss, iteration)
@@ -303,7 +309,7 @@ def main():
                 save_model(net, optimizer, train_loss, val_loss, iteration, batch_size, epoch, last_path)
                 train_loss = train_num = 0
 
-            # Validation
+            # Validation (every validation_interval invervals)
             if iteration > 0 and (iteration % validation_interval == 0):
 
                 # Model checkpoint
@@ -329,7 +335,9 @@ def main():
 
                 # Model checkpoint
                 if val_loss < min_val_loss:
+                    # if current validation loss is lower than the best one
                     min_val_loss = val_loss
+                    # save the best model
                     save_model(net, optimizer, train_loss, val_loss, iteration, batch_size, epoch, bestval_path)
 
                 # Attention
