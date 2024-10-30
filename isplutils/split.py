@@ -85,7 +85,15 @@ def get_split_df(df: pd.DataFrame, dataset: str, split: str) -> pd.DataFrame:
     elif dataset == 'celebdf':
 
         seed = 41
-        num_real_train = 600
+        # num_real_train = 600 # no validation samples
+        # num_real_train = 400 # no validation samples
+        # num_real_train = 100 # Training samples: 200 / Validation samples: 542
+        # num_real_train = 200 # Training samples: 400 / Validation samples: 342
+        num_real_train = 300 # Training samples: 600 / Validation samples: 142
+        # num_real_train 값은 train 데이터셋에 포함될 실제(real) 비디오 샘플의 개수를 의미합니다.
+        # 이 변수는 데이터셋을 train과 val로 나눌 때 train에 할당할 실제 비디오 샘플의 개수를 설정하는 기준이 됩니다.
+        # 예를 들어: num_real_train = 600이라면, train 데이터셋에는 600개의 실제(real) 비디오가 할당됩니다.
+        # 나머지 실제 비디오 샘플은 val 데이터셋으로 들어가게 됩니다.
 
         # Save random state
         st0 = np.random.get_state()
@@ -97,6 +105,8 @@ def get_split_df(df: pd.DataFrame, dataset: str, split: str) -> pd.DataFrame:
             df[(df['label'] == False) & (df['test'] == False)]['name'].unique())
         train_orig = random_train_val_real_videos[:num_real_train]
         val_orig = random_train_val_real_videos[num_real_train:]
+        # debugging
+        print('split=',split)
         if split == 'train':
             split_df = pd.concat((df[df['original'].isin(train_orig)], df[df['name'].isin(train_orig)]), axis=0)
         elif split == 'val':
@@ -109,6 +119,8 @@ def get_split_df(df: pd.DataFrame, dataset: str, split: str) -> pd.DataFrame:
         np.random.set_state(st0)
     else:
         raise NotImplementedError('Unknown dataset: {}'.format(dataset))
+    # debugging
+    print('split_df.head():\n',split_df.head())
     return split_df
 
 
@@ -127,13 +139,15 @@ def make_splits(celeb_df: str,dfdc_df: str, ffpp_df: str, celeb_dir: str, dfdc_d
                 Example:
                 {'train, 'dfdc-35-5-15': (dfdc_train_df, 'path/to/dir/of/DFDC/faces')}
     """
+    # debugging
+    print("Contents of dbs:", dbs)
     split_dict = {}
     full_dfs = {}
     for split_name, split_dbs in dbs.items():
         split_dict[split_name] = dict()
         for split_db in split_dbs:
             if split_db not in full_dfs:
-                full_dfs[split_db] = load_df(celeb_df,dfdc_df, ffpp_df, celeb_dir, dfdc_dir, ffpp_dir, split_db)
+                full_dfs[split_db] = load_df(celeb_df, dfdc_df, ffpp_df, celeb_dir, dfdc_dir, ffpp_dir, split_db)
             full_df, root = full_dfs[split_db]
             split_df = get_split_df(df=full_df, dataset=split_db, split=split_name)
             split_dict[split_name][split_db] = (split_df, root)
