@@ -103,8 +103,12 @@ def main():
     print('Real videos: {:d}'.format(sum(df_videos['label'] == 0)))
     print('Fake videos: {:d}'.format(sum(df_videos['label'] == 1)))
     pd.set_option('display.max_columns', None)
-    print(df_videos.head())
+    print(df_videos.head(20))
     print(df_videos.info())
+
+    # Check dataframe on excel format
+    df_videos.to_excel("celebdf_videos.xlsx", index=False)
+
 
 if __name__ == '__main__':
     main()
