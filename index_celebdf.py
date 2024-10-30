@@ -60,6 +60,7 @@ def main():
         if not split_file.exists():
             raise FileNotFoundError('Unable to find "List_of_testing_videos.txt" in {}'.format(source_dir))
         test_videos_df = pd.read_csv(split_file, delimiter=' ', header=0, index_col=1)
+        # 2nd column of 'List_of_testing_videos.txt' file.
 
         ff_videos = Path(source_dir).rglob('*.mp4')
         df_videos = pd.DataFrame(
@@ -97,7 +98,7 @@ def main():
 
         df_videos['test'] = df_videos['path'].map(str).isin(test_videos_df.index)
         # 'path' example: 'Celeb-synthesis/id3_id1_0001.mp4'
-        # If path is in test_videos_df.index -> true (= test dataset), else false (= train dataset)
+        # If path is in 2nd column of txt file (the list) -> true (= test dataset), else false (= train dataset)
         # List_of_testing_videos.txt
         # df_videos['path']의 경로들을 문자열로 변환한 뒤, test_videos_df.index와 비교하여 True/False 값을 반환합니다.
         # test_videos_df에는 test 데이터에 해당하는 파일 이름들이 인덱스로 지정되어 있어, 
