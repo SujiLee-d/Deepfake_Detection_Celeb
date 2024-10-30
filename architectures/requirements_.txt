@@ -1,0 +1,19 @@
+# use this command: pip install -r requirements.txt
+# conda install cudatoolkit
+# py-opencv: You can replace py-opencv=3.4.2 with opencv-python==3.4.2 in pip.
+
+av==6.2.0
+albumentations
+ffmpeg
+jupyter
+numpy
+opencv-python==3.4.2
+torch==1.4.0
+torchvision
+tqdm
+pandas
+tensorboardx==2.0
+efficientnet-pytorch
+scikit-learn
+
+

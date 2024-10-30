@@ -77,9 +77,14 @@ def main():
             df_videos.loc[idx, ['height', 'width', 'frames']] = meta
 
         df_videos['class'] = df_videos['path'].map(lambda x: x.parts[0]).astype('category')
+        # df_videos['path']: 각 비디오 파일의 상대 경로입니다.
+        # lambda x: x.parts[0]: path 열의 경로에서 최상위 폴더명을 추출. 
+        # .astype('category'): 결과를 범주형(category) 데이터로 변환하여 저장 (메모리 최적화)
+
         df_videos['label'] = df_videos['class'].map(
             lambda x: True if x == 'Celeb-synthesis' else False)  # True is FAKE, False is REAL
-            # if folder name == 'Celeb-synthesis', True (FAKE)
+            # if class(folder name) == 'Celeb-synthesis', label == True (FAKE)
+            # if class(folder name) != 'Celeb-synthesis', label == False (REAL)
         df_videos['split'] = df_videos['path'].map(lambda x: x.parts[1])
         df_videos['name'] = df_videos['path'].map(lambda x: x.with_suffix('').name)
 
@@ -97,7 +102,9 @@ def main():
 
     print('Real videos: {:d}'.format(sum(df_videos['label'] == 0)))
     print('Fake videos: {:d}'.format(sum(df_videos['label'] == 1)))
-
+    pd.set_option('display.max_columns', None)
+    print(df_videos.head())
+    print(df_videos.info())
 
 if __name__ == '__main__':
     main()
