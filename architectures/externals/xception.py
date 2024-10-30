@@ -222,6 +222,12 @@ def xception(num_classes=1000, pretrained='imagenet'):
             "num_classes should be {}, but is {}".format(settings['num_classes'], num_classes)
 
         model = Xception(num_classes=num_classes)
+        import ssl
+        import torch.utils.model_zoo as model_zoo
+
+        # SSL 검증 비활성화 설정
+        ssl._create_default_https_context = ssl._create_unverified_context
+
         model.load_state_dict(model_zoo.load_url(settings['url']))
 
         model.input_space = settings['input_space']
