@@ -27,7 +27,9 @@ torch.multiprocessing.set_sharing_strategy('file_system')
 import torch.nn as nn
 from albumentations.pytorch import ToTensorV2
 from sklearn.metrics import roc_auc_score
-from tensorboardX import SummaryWriter
+# from tensorboardX import SummaryWriter -> error 나서 바꿔봄
+from torch.utils.tensorboard import SummaryWriter
+
 from torch import optim
 from torch.utils.data import DataLoader
 from tqdm import tqdm
@@ -214,7 +216,7 @@ def main():
 
     # TensorboardX instance
     # Tensorboard logging instance - for visualisation
-    tb = SummaryWriter(logdir=logdir)
+    tb = SummaryWriter(log_dir=logdir)
     if iteration == 0:
         dummy = torch.randn((1, 3, face_size, face_size), device=device)
         dummy = dummy.to(device)
