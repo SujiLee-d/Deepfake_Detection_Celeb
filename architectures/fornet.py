@@ -17,7 +17,8 @@ from torch import nn as nn
 from torch.nn import functional as F
 from torchvision import transforms
 
-from . import externals
+# from . import externals
+from architectures import externals
 
 """
 Feature Extractor
