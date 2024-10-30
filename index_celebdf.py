@@ -56,7 +56,7 @@ def main():
     else:
         print('Creating video DataFrame')
 
-        split_file = Path(source_dir).joinpath('List_of_testing_videos.txt')
+        split_file = Path(source_dir).joinpath('List_of_testing_videos.txt') #read txt file in the source dir
         if not split_file.exists():
             raise FileNotFoundError('Unable to find "List_of_testing_videos.txt" in {}'.format(source_dir))
         test_videos_df = pd.read_csv(split_file, delimiter=' ', header=0, index_col=1)
@@ -96,12 +96,20 @@ def main():
             )
 
         df_videos['test'] = df_videos['path'].map(str).isin(test_videos_df.index)
+        # 'path' example: 'Celeb-synthesis/id3_id1_0001.mp4'
+        # If path is in test_videos_df.index -> true (= test dataset), else false (= train dataset)
+        # List_of_testing_videos.txt
+        # df_videos['path']의 경로들을 문자열로 변환한 뒤, test_videos_df.index와 비교하여 True/False 값을 반환합니다.
+        # test_videos_df에는 test 데이터에 해당하는 파일 이름들이 인덱스로 지정되어 있어, 
+        # test 비디오와 일치하는 파일 경로는 True, 일치하지 않으면 False로 저장됩니다.
 
         print('Saving video DataFrame to {}'.format(videodataset_path))
-        df_videos.to_pickle(str(videodataset_path)) # error의 문제가 되는 부분; videodataset_path 위치에 data/celebdf_videos.pkl 파일이 생성
+        df_videos.to_pickle(str(videodataset_path)) # error의 문제가 되는 부분; videodataset_path 위치에 data/celebdf_videos.pkl 파일이 생성; 해결
 
     print('Real videos: {:d}'.format(sum(df_videos['label'] == 0)))
     print('Fake videos: {:d}'.format(sum(df_videos['label'] == 1)))
+
+    # Check dataframe on terminal
     pd.set_option('display.max_columns', None)
     print(df_videos.head(20))
     print(df_videos.info())
