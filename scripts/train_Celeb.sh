@@ -25,8 +25,8 @@ python train_binclass.py \
 --net Xception \
 --traindb celebdf \
 --valdb celebdf \
---dfdc_faces_df_path $CELEB_FACES_DF \
---dfdc_faces_dir $CELEB_FACES_DIR \
+--celeb_faces_df_path $CELEB_FACES_DF \
+--celeb_faces_dir $CELEB_FACES_DIR \
 --face scale \
 --size 224 \
 --batch 32 \

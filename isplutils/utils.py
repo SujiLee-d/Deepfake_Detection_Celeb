@@ -188,7 +188,9 @@ def get_transformer(face_policy: str, patch_size: int, net_normalizer: transform
                 ]),
                 A.OneOf([
                     A.ISONoise(),
-                    A.IAAAdditiveGaussianNoise(scale=(0.01 * 255, 0.03 * 255)),
+                    # A.IAAAdditiveGaussianNoise(scale=(0.01 * 255, 0.03 * 255)),
+                    # ^ No longer supported
+                    A.GaussNoise(var_limit=(10.0, 50.0))
                 ]),
                 A.Downscale(scale_min=0.7, scale_max=0.9, interpolation=cv2.INTER_LINEAR),
                 A.ImageCompression(quality_lower=50, quality_upper=99),

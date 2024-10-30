@@ -25,8 +25,13 @@ available_datasets = [
 ]
 
 
-def load_df(dfdc_df_path: str, ffpp_df_path: str, dfdc_faces_dir: str, ffpp_faces_dir: str, dataset: str) -> (pd.DataFrame, str):
-    if dataset.startswith('dfdc'):
+def load_df(celeb_df_path: str, dfdc_df_path: str, ffpp_df_path: str, celeb_faces_dir: str, dfdc_faces_dir: str, ffpp_faces_dir: str, dataset: str) -> (pd.DataFrame, str):
+    # added code
+    if dataset.startswith('celebdf'):
+        df = pd.read_pickle(celeb_df_path)
+        root = celeb_faces_dir
+    ##
+    elif dataset.startswith('dfdc'):
         df = pd.read_pickle(dfdc_df_path)
         root = dfdc_faces_dir
     elif dataset.startswith('ff-'):
@@ -55,24 +60,24 @@ def get_split_df(df: pd.DataFrame, dataset: str, split: str) -> pd.DataFrame:
         # Split on original videos
         crf = dataset.split('-')[1]
         random_youtube_videos = np.random.permutation(
-            df[(df['source'] == 'youtube') & (df['quality'] == crf)]['video'].unique())
+            df[(df['source'] == 'youtube') & (df['quality'] == crf)]['name'].unique())
         train_orig = random_youtube_videos[:720]
         val_orig = random_youtube_videos[720:720 + 140]
         test_orig = random_youtube_videos[720 + 140:]
         if split == 'train':
-            split_df = pd.concat((df[df['original'].isin(train_orig)], df[df['video'].isin(train_orig)]), axis=0)
+            split_df = pd.concat((df[df['original'].isin(train_orig)], df[df['name'].isin(train_orig)]), axis=0)
         elif split == 'val':
-            split_df = pd.concat((df[df['original'].isin(val_orig)], df[df['video'].isin(val_orig)]), axis=0)
+            split_df = pd.concat((df[df['original'].isin(val_orig)], df[df['name'].isin(val_orig)]), axis=0)
         elif split == 'test':
-            split_df = pd.concat((df[df['original'].isin(test_orig)], df[df['video'].isin(test_orig)]), axis=0)
+            split_df = pd.concat((df[df['original'].isin(test_orig)], df[df['name'].isin(test_orig)]), axis=0)
         else:
             raise NotImplementedError('Unknown split: {}'.format(split))
 
         if dataset.endswith('fpv'):
             fpv = int(dataset.rsplit('-', 1)[1][:-3])
             idxs = []
-            for video in split_df['video'].unique():
-                idxs.append(np.random.choice(split_df[split_df['video'] == video].index, fpv, replace=False))
+            for video in split_df['name'].unique():
+                idxs.append(np.random.choice(split_df[split_df['name'] == video].index, fpv, replace=False))
             idxs = np.concatenate(idxs)
             split_df = split_df.loc[idxs]
         # Restore random state
@@ -88,13 +93,14 @@ def get_split_df(df: pd.DataFrame, dataset: str, split: str) -> pd.DataFrame:
         np.random.seed(seed)
         # Split on original videos
         random_train_val_real_videos = np.random.permutation(
-            df[(df['label'] == False) & (df['test'] == False)]['video'].unique())
+                                    # np.random.permutation은 고유한 Real 비디오 ID를 랜덤하게 섞어 배열로 반환
+            df[(df['label'] == False) & (df['test'] == False)]['name'].unique())
         train_orig = random_train_val_real_videos[:num_real_train]
         val_orig = random_train_val_real_videos[num_real_train:]
         if split == 'train':
-            split_df = pd.concat((df[df['original'].isin(train_orig)], df[df['video'].isin(train_orig)]), axis=0)
+            split_df = pd.concat((df[df['original'].isin(train_orig)], df[df['name'].isin(train_orig)]), axis=0)
         elif split == 'val':
-            split_df = pd.concat((df[df['original'].isin(val_orig)], df[df['video'].isin(val_orig)]), axis=0)
+            split_df = pd.concat((df[df['original'].isin(val_orig)], df[df['name'].isin(val_orig)]), axis=0)
         elif split == 'test':
             split_df = df[df['test'] == True]
         else:
@@ -106,7 +112,7 @@ def get_split_df(df: pd.DataFrame, dataset: str, split: str) -> pd.DataFrame:
     return split_df
 
 
-def make_splits(dfdc_df: str, ffpp_df: str, dfdc_dir: str, ffpp_dir: str, dbs: Dict[str, List[str]]) -> Dict[str, Dict[str, Tuple[pd.DataFrame, str]]]:
+def make_splits(celeb_df: str,dfdc_df: str, ffpp_df: str, celeb_dir: str, dfdc_dir: str, ffpp_dir: str, dbs: Dict[str, List[str]]) -> Dict[str, Dict[str, Tuple[pd.DataFrame, str]]]:
     """
     Make split and return Dataframe and root
     :param
@@ -127,7 +133,7 @@ def make_splits(dfdc_df: str, ffpp_df: str, dfdc_dir: str, ffpp_dir: str, dbs: D
         split_dict[split_name] = dict()
         for split_db in split_dbs:
             if split_db not in full_dfs:
-                full_dfs[split_db] = load_df(dfdc_df, ffpp_df, dfdc_dir, ffpp_dir, split_db)
+                full_dfs[split_db] = load_df(celeb_df,dfdc_df, ffpp_df, celeb_dir, dfdc_dir, ffpp_dir, split_db)
             full_df, root = full_dfs[split_db]
             split_df = get_split_df(df=full_df, dataset=split_db, split=split_name)
             split_dict[split_name][split_db] = (split_df, root)
