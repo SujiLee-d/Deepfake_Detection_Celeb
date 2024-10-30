@@ -45,6 +45,14 @@ def main():
                         required=True)
     parser.add_argument('--valdb', type=str, help='Validation datasets', nargs='+', choices=split.available_datasets,
                         required=True)
+    # added code
+    parser.add_argument('--celeb_faces_df_path', type=str, action='store',
+                    help='Path to the Pandas Dataframe obtained from extract_faces.py on the Celeb-DF dataset. '
+                         'Required for training/validating on the Celeb-DF dataset.')
+    parser.add_argument('--celeb_faces_dir', type=str, action='store',
+                    help='Path to the directory containing the faces extracted from the Celeb-DF dataset. '
+                         'Required for training/validating on the Celeb-DF dataset.')
+    ## 
     parser.add_argument('--dfdc_faces_df_path', type=str, action='store',
                         help='Path to the Pandas Dataframe obtained from extract_faces.py on the DFDC dataset. '
                              'Required for training/validating on the DFDC dataset.')
@@ -95,10 +103,15 @@ def main():
     net_class = getattr(fornet, args.net)
     train_datasets = args.traindb
     val_datasets = args.valdb
+    # added code
+    celeb_df_path = args.celeb_faces_df_path
+    celeb_faces_dir = args.celeb_faces_dir
+    ## 
     dfdc_df_path = args.dfdc_faces_df_path
     ffpp_df_path = args.ffpp_faces_df_path
     dfdc_faces_dir = args.dfdc_faces_dir
     ffpp_faces_dir = args.ffpp_faces_dir
+
     face_policy = args.face
     face_size = args.size
 
@@ -217,21 +230,28 @@ def main():
     print('Loading data')
     # Check if paths for DFDC and FF++ extracted faces and DataFrames are provided
     for dataset in train_datasets:
-        if dataset.split('-')[0] == 'dfdc' and (dfdc_df_path is None or dfdc_faces_dir is None):
+        if dataset.split('-')[0] == 'celebdf' and (celeb_df_path is None or celeb_faces_dir is None):
+            raise RuntimeError('Specify DataFrame and directory for Celeb-DF faces for training!')
+        elif dataset.split('-')[0] == 'dfdc' and (dfdc_df_path is None or dfdc_faces_dir is None):
             raise RuntimeError('Specify DataFrame and directory for DFDC faces for training!')
         elif dataset.split('-')[0] == 'ff' and (ffpp_df_path is None or ffpp_faces_dir is None):
             raise RuntimeError('Specify DataFrame and directory for FF++ faces for training!')
     for dataset in val_datasets:
-        if dataset.split('-')[0] == 'dfdc' and (dfdc_df_path is None or dfdc_faces_dir is None):
+        if dataset.split('-')[0] == 'celebdf' and (celeb_df_path is None or celeb_faces_dir is None):
+            raise RuntimeError('Specify DataFrame and directory for Celeb-DF faces for validation!')
+        elif dataset.split('-')[0] == 'dfdc' and (dfdc_df_path is None or dfdc_faces_dir is None):
             raise RuntimeError('Specify DataFrame and directory for DFDC faces for validation!')
         elif dataset.split('-')[0] == 'ff' and (ffpp_df_path is None or ffpp_faces_dir is None):
             raise RuntimeError('Specify DataFrame and directory for FF++ faces for validation!')
         
     #TODO
     # Load splits with the make_splits function
-    splits = split.make_splits(dfdc_df=dfdc_df_path, ffpp_df=ffpp_df_path, dfdc_dir=dfdc_faces_dir, ffpp_dir=ffpp_faces_dir,
+    splits = split.make_splits(dfdc_df=dfdc_df_path, ffpp_df=ffpp_df_path, celeb_df=celeb_df_path, dfdc_dir=dfdc_faces_dir, ffpp_dir=ffpp_faces_dir, celeb_dir=celeb_faces_dir,
                                dbs={'train': train_datasets, 'val': val_datasets})
     train_dfs = [splits['train'][db][0] for db in splits['train']]
+    # train_dfs 리스트에 모든 훈련 데이터프레임을 모읍니다.
+    # 예를 들어, splits['train']['db1'][0]이 특정 데이터프레임을 나타낸다면, 
+    # train_dfs에는 ['db1'의 데이터프레임, 'db2'의 데이터프레임, ...]과 같이 모든 훈련 데이터프레임들이 저장됩니다.
     train_roots = [splits['train'][db][1] for db in splits['train']]
     val_roots = [splits['val'][db][1] for db in splits['val']]
     val_dfs = [splits['val'][db][0] for db in splits['val']]
