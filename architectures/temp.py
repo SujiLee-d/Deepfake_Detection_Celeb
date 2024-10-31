@@ -1,5 +1,7 @@
 # Ensemble – Stacking Code example
 
+import os
+import pandas as pd
 from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, VotingClassifier
@@ -7,11 +9,33 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
 
 # 1. 데이터 로드 및 분할
-data = load_breast_cancer()
-X, y = data.data, data.target
+# df_faces = pd.read_pickle("/Users/suji/Downloads/UTS_Masters/SEM3/IPPR_42177/data/celebdf_videos.pkl")
 
-# 학습 데이터와 테스트 데이터를 나눕니다.
+# X = df_faces[['height', 'width', 'frames', 'nfaces']]
+# y = df_faces['label']
+
+# 1. 데이터 로드 (IMG)
+df_faces = pd.read_pickle("/Users/suji/Downloads/UTS_Masters/SEM3/IPPR_42177/data/celebdf_videos.pkl")
+
+# 이미지가 저장된 기본 경로
+base_image_dir = '/Users/suji/Downloads/UTS_Masters/SEM3/IPPR_42177/FACES_DST/'
+
+# 'path' 열을 사용해 이미지 경로 리스트를 생성
+df_faces['image_paths'] = df_faces['path'].apply(lambda x: [os.path.join(base_image_dir, x, img) for img in os.listdir(os.path.join(base_image_dir, x)) if img.endswith(".jpg")])
+
+# X에는 이미지 경로 리스트를, y에는 label을 설정
+X = df_faces['image_paths'].tolist()
+y = df_faces['label'].tolist()
+
+# 데이터 분할
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# 확인
+print(f"Train set: {len(X_train)} samples")
+print(f"Test set: {len(X_test)} samples")
+print("Example of X_train:", X_train[0])  # X_train의 첫 번째 샘플 확인
+print("Example of y_train:", y_train[0])  # y_train의 첫 번째 라벨 확인
+
 
 # 2. 기본 학습자 (Base Learners)
 # RandomForest, GradientBoosting, Logistic Regression을 기본 학습자로 사용
@@ -62,3 +86,6 @@ stacking_clf = StackingClassifier(estimators=estimators, final_estimator=final_e
 stacking_clf.fit(X_train, y_train)
 y_pred = stacking_clf.predict(X_test)
 
+# 모델 평가
+accuracy = accuracy_score(y_test, y_pred)
+print(f'Stacking 모델의 정확도: {accuracy:.2f}')
