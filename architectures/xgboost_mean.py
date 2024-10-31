@@ -37,7 +37,7 @@ grouped_df = X_preprocessed.groupby('video').mean()  #0.75
 # grouped_df = X_preprocessed.groupby('video').median()   #0.74
 
 
-# first value of 'label' column for prediction result used
+# first value of 'label' column of each group is used (True = deepfake generated, False = real)
 labels = X_preprocessed.groupby('video')['label'].first()
 
 # Define feature vectors and labels
