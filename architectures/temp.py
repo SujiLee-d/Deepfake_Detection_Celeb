@@ -36,7 +36,6 @@ print(f"Test set: {len(X_test)} samples")
 print("Example of X_train:", X_train[0])  # X_train의 첫 번째 샘플 확인
 print("Example of y_train:", y_train[0])  # y_train의 첫 번째 라벨 확인
 
-
 # 2. 기본 학습자 (Base Learners)
 # RandomForest, GradientBoosting, Logistic Regression을 기본 학습자로 사용
 rf_clf = RandomForestClassifier(n_estimators=100, random_state=42)

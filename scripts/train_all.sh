@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 DEVICE=0
 
+# Train <<Model>> on <<Dataset>>
+
 echo ""
 echo "-------------------------------------------------"
 echo "| Train Xception on FFc23                       |"

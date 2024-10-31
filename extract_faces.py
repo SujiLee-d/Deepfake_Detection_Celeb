@@ -1,4 +1,8 @@
 """
+Modified by Suji Lee
+"""
+
+"""
 Extract faces
 
 Video Face Manipulation Detection Through Ensemble of CNNs
